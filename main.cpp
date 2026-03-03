@@ -1,3 +1,4 @@
+//hello guiz please read the comments to understand the blocks easily:)
 #include <Arduino.h>
 #include <ESP32Servo.h>
 
@@ -9,7 +10,7 @@ Servo LB;
 Servo RF;
 Servo RB;
 
-// defining the for servo's and
+// defining pins for all the servo's and sensors
 #define head_pin 13
 #define LF_pin 12
 #define LB_pin 14
@@ -29,6 +30,7 @@ const unsigned long output_interval = 500;
 const unsigned long cool_down = 3000;
 const int entry_distance = 100;
 const int exit_distance = 120;
+const int buzzerTimer = 3;
 
 // intially starting all the timer's from 0second
 unsigned long tail_timer = 0;
@@ -75,8 +77,7 @@ const int RF_SA = 0;
 const int RB_SLA = 0;
 const int RB_SA = 110;
 
-const int buzzerChannel = 7; // highest channel
-const int buzzerTimer = 3;   // use separate timer
+const int buzzerChannel = 7;
 
 // defined standing robo function with a generalised formula to operate each leg as-
 //-all of them different standing and sleeping angle
@@ -84,10 +85,10 @@ void standingRobo()
 {
     for (int step = 0; step <= 100; step++)
     {
-        LF.write(LF_SLA + (LF_SA - LF_SLA) * step / 100);
-        LB.write(LB_SLA + (LB_SA - LB_SLA) * step / 100);
-        RF.write(RF_SLA + (RF_SA - RF_SLA) * step / 100);
-        RB.write(RB_SLA + (RB_SA - RB_SLA) * step / 100);
+        LF.write(LF_SLA +(LF_SA -LF_SLA)* step / 100);
+        LB.write(LB_SLA +(LB_SA -LB_SLA)* step / 100);
+        RF.write(RF_SLA +(RF_SA -RF_SLA)* step / 100);
+        RB.write(RB_SLA +(RB_SA -RB_SLA * step / 100);
         delay(10);
     }
     isStanding = true;
@@ -98,10 +99,10 @@ void sleepyRobo()
 {
     for (int step = 0; step <= 100; step++)
     {
-        LF.write(LF_SA + (LF_SLA - LF_SA) * step / 100);
-        LB.write(LB_SA + (LB_SLA - LB_SA) * step / 100);
-        RF.write(RF_SA + (RF_SLA - RF_SA) * step / 100);
-        RB.write(RB_SA + (RB_SLA - RB_SA) * step / 100);
+        LF.write(LF_SA +(LF_SLA -LF_SA) * step / 100);
+        LB.write(LB_SA + (LB_SLA -LB_SA) * step / 100);
+        RF.write(RF_SA +(RF_SLA -RF_SA) * step / 100);
+        RB.write(RB_SA + (RB_SLA -RB_SA) * step / 100);
         delay(10);
     }
     isStanding = false;
@@ -110,7 +111,7 @@ void sleepyRobo()
 void setup()
 {
     Serial.begin(115200);
-    // allocating timer to the servo, for proper resource contention
+    // allocating timer explicitly to the servo, for proper resource contention
     ESP32PWM::allocateTimer(0);
     ESP32PWM::allocateTimer(1);
     ESP32PWM::allocateTimer(2);
@@ -131,6 +132,7 @@ void setup()
     head.write(90);
     tail.write(120);
 
+    //buzzer setup at 7th channel at 2KHz and resoultion is of 8bit
     ledcSetup(buzzerChannel, 2000, 8);
     ledcAttachPin(buzzer_pin, buzzerChannel);
     ledcWrite(buzzerChannel, 0);
@@ -139,7 +141,7 @@ void setup()
     sleepyRobo();
 }
 
-// function to create sound's with stages and update the alert's
+// function to create sound's with stages and update the alert's Using a passive buzzer
 void updateAlert()
 {
     if (State == TARGET_LOCKED)
